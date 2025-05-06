@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ansatt</title>
+  <style>
+    html, body {
+      margin: 0;
+      height: 100%;
+    }
+
+    h1, h2, h3, p {
+      margin: 0;
+    }
+
+    main {
+      padding: .5rem;
+    }
+
+    .status {
+      display: flex;
+
+      align-items: center;
+      justify-content: center;
+
+      box-sizing: border-box;
+      height: 2rem;
+      padding: 0 .75rem;
+      border-radius: 1rem;
+      border: none;
+      font: inherit;
+
+      &.open {
+        background-color: green;
+        color: white;
+      }
+
+      &.closed {
+        background-color: red;
+        color: white;
+      }
+
+      &.inprogress {
+        background-color: plum;
+        color: white;
+      }
+    }
+
+    header {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      height: 3rem;
+      padding: .5rem;
+      &>h1 {
+        font-size: 1.5rem;
+      }
+    }
+
+    section {
+      padding: .5rem;
+    }
+
+    .tickets {
+      display: flex;
+      flex-direction: column;
+      gap: .5rem;
+      padding: .5rem;
+    }
+    .ticket {
+      display: flex;
+      flex-direction: column;
+      padding: .5rem;
+      gap: .5rem;
+      border-radius: .5rem;
+      box-shadow: 0 .25rem 1rem 0 #0000007f;
+      
+      &>.title {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+      }
+      &>p {
+        border-left: .25rem solid teal;
+        padding: .5rem;
+      }
+    }
+    .changestatus {
+      display: flex;
+      flex-direction: row;
+      gap: .5rem;
+      justify-content: space-between;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Ansatt</h1>
+  </header>
+  <main>
+    <section>
+      <h2>Tickets</h2>
+      <div class="tickets">
+        {% for ticket in tickets %}
+          <div class="ticket">
+            <div class="title">
+              <h3>
+                {{ ticket['title'] }}
+              </h3>
+              <span class="status {{ ticket['status'] == 'in progress' and 'inprogress' or ticket['status'] }}">
+                {{ ticket['status'] }}
+              </span>
+            </div>
+            <p>{{ ticket['description'] }}</p>
+            <span>Set status</span>
+            <div class="changestatus">
+              {% for status in ['open', 'in progress', 'closed'] %}
+                <button class="status {{ status == 'in progress' and 'inprogress' or status }}">
+                  {{ status }}
+                </button>
+              {% endfor %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </section>
+    <section>
+      <h2>Brukere</h2>
+    </section>
+  </main>
+</body>
+</html>

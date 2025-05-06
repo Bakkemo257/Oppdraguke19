@@ -8,8 +8,7 @@ connection = mariadb.connect(
   user=MARIADB['user'],
   password=MARIADB['password'],
   host=MARIADB['host'],
-  port=MARIADB['port'],
-  db=MARIADB['database']
+  port=MARIADB['port']
 )
 
 cursor = connection.cursor()
