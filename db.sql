@@ -1,3 +1,8 @@
+DROP DATABASE IF EXISTS ticket_system;
+CREATE DATABASE ticket_system;
+
+USE ticket_system;
+
 CREATE TABLE tickets (
   id CHAR(36) NOT NULL PRIMARY KEY, -- UUID / GUID
   title VARCHAR(64) NOT NULL,

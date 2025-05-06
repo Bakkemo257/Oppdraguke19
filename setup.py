@@ -14,8 +14,10 @@ connection = mariadb.connect(
 
 cursor = connection.cursor()
 
-for command in sql.split('\n\n'):
+for command in sql.split(';'):
+  if command.strip() == '': continue
   cursor.execute(command)
+
 connection.commit()
 connection.close()
 
