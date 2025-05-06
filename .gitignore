@@ -7,3 +7,6 @@ pyvenv.cfg
 
 # Secrets
 secret.py
+
+
+__pycache__

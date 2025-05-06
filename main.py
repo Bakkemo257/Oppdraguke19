@@ -6,5 +6,9 @@ app = Flask(__name__)
 def ticket():
     return render_template("ticket.html")
 
+@app.route("/login")
+def login():
+    return render_template("login.html")
+
 if __name__ == "__main__":
     app.run()
