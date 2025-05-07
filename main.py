@@ -1,9 +1,11 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, session
 from mariadb import connect
-from secret import MARIADB
-from werkzeug.security import generate_password_hash
+# Local file secret.py
+from secret import MARIADB, SECRET_KEY
+from werkzeug.security import check_password_hash
 
 app = Flask(__name__)
+app.secret_key = SECRET_KEY
 
 @app.route("/")
 def ticket():
@@ -12,14 +14,33 @@ def ticket():
 @app.route('/login',  methods=["post", "Get"])
 def login():
     if request.method == 'POST':
-        username = request.form["username"] 
+        email = request.form["email"] 
         password = request.form["password"]
-
-
-        hashed_password = generate_password_hash(password).encode('utf-8')
-        print(hashed_password)
     
-        return redirect("/login")
+        connection = connect(
+            user=MARIADB['user'],
+            password=MARIADB['password'],
+            host=MARIADB['host'],
+            port=MARIADB['port'],
+            database='ticket_system'
+        )
+
+        cursor = connection.cursor()
+        cursor.execute('select hash from clients where email = ?', (email,))
+
+        client = cursor.fetchone()
+
+        if not client:
+            return redirect("/login")
+
+        if not check_password_hash(client[0], password):
+            return redirect("/login")
+
+        # Set session token
+        session['email'] = email
+
+        return redirect('/ansatt')
+
     if request.method =="GET":
         return render_template("login.html")
 
@@ -34,6 +55,15 @@ def ansatt():
     )
 
     cursor = connection.cursor()
+
+    # Check if user is authorized
+    email = session['email']
+    cursor.execute('select * from clients where email = ?', (email,))
+
+    client = cursor.fetchone()
+
+    if not client:
+        return redirect('/login')
 
     cursor.execute('select id, title, description, name, email, status from tickets')
 
