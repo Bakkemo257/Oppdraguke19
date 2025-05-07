@@ -1,0 +1,26 @@
+body, html {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  display: flex;
+  flex-direction: row;
+  gap: .5rem;
+  height: 3rem;
+  padding: .5rem;
+  align-items: center;
+  justify-content: space-between;
+
+  &>nav {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: .5rem;
+  }
+}
