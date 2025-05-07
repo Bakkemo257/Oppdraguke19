@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, redirect, session
 from mariadb import connect
 # Local file secret.py
 from secret import MARIADB, SECRET_KEY
-from werkzeug.security import check_password_hash
+from werkzeug.security import check_password_hash, generate_password_hash
 
 app = Flask(__name__)
 app.secret_key = SECRET_KEY
@@ -81,6 +81,48 @@ def ansatt():
     print(tickets)
 
     return render_template("ansatt.html", tickets=tickets)
+
+@app.post('/adduser')
+def adduser ():
+    if 'email' not in session:
+        return redirect('/ansatt')
+    
+    password = request.form['password']
+    email = request.form['email']
+    name = request.form['name']
+    admin = 'admin' in request.form
+
+    connection = connect(
+        user=MARIADB['user'],
+        password=MARIADB['password'],
+        host=MARIADB['host'],
+        port=MARIADB['port'],
+        database='ticket_system'
+    )
+
+    cursor = connection.cursor()
+
+    cursor.execute('select admin from clients where email = ?', (session['email'],))
+
+    client = cursor.fetchone()
+
+    if not client:
+        return redirect('/')
+    
+    if not client[0]:
+        return redirect('/ansatt')
+    
+    # Hash password
+    hash = generate_password_hash(password)
+
+    # Add user
+    cursor.execute('insert into clients (email, name, hash, admin) values (?, ?, ?, ?)', (email, name, hash, admin))
+
+    connection.commit()
+    connection.close()
+
+    return redirect('/ansatt')
+
 
 if __name__ == "__main__":
     app.run(debug=True)

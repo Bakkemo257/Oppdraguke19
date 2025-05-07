@@ -40,7 +40,7 @@
         color: white;
       }
     }
-    
+
     section {
       padding: .5rem;
     }
@@ -77,6 +77,32 @@
 
       & .status {
         flex: 1;
+      }
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: .5rem;
+
+      & input {
+        height: 2rem;
+        border: 1px solid #7f7f7f;
+        margin: 0;
+      }
+    }
+    label {
+      display: flex;
+      flex-direction: column;
+
+      &:has([type="checkbox"]) {
+        flex-direction: row;
+        align-items: center;
+        gap: .5rem;
+
+        &>input {
+          height: 1rem;
+          width: 1rem;
+        }
       }
     }
   </style>
@@ -116,6 +142,25 @@
     </section>
     <section>
       <h2>Brukere</h2>
+      <form action="/adduser" method="post">
+        <label>
+          Epost
+          <input type="email" name="email" placeholder="Epost-adresse">
+        </label>
+        <label>
+          Navn
+          <input type="text" name="name" placeholder="Navn">
+        </label>
+        <label>
+          Passord
+          <input type="password" name="password" placeholder="Passord">
+        </label>
+        <label>
+          Admin
+          <input type="checkbox" name="admin">
+        </label>
+        <input type="submit" value="Legg til bruker">
+      </form>
     </section>
   </main>
 {% endblock %}
