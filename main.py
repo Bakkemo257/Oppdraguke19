@@ -1,16 +1,27 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request, redirect
 from mariadb import connect
 from secret import MARIADB
+from werkzeug.security import generate_password_hash
 
 app = Flask(__name__)
 
-@app.route("/ticket")
+@app.route("/")
 def ticket():
     return render_template("ticket.html")
 
-@app.route("/login")
+@app.route('/login',  methods=["post", "Get"])
 def login():
-    return render_template("login.html")
+    if request.method == 'POST':
+        username = request.form["username"] 
+        password = request.form["password"]
+
+
+        hashed_password = generate_password_hash(password).encode('utf-8')
+        print(hashed_password)
+    
+        return redirect("/login")
+    if request.method =="GET":
+        return render_template("login.html")
 
 @app.route("/ansatt")
 def ansatt():
@@ -42,4 +53,4 @@ def ansatt():
     return render_template("ansatt.html", tickets=tickets)
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)
