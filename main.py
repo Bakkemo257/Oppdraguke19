@@ -144,6 +144,26 @@ def adduser ():
 
     return redirect('/ansatt')
 
+@app.route('/ticket/<uuid>')
+def ticket_page(uuid):
+    connection = connect(
+        user=MARIADB['user'],
+        password=MARIADB['password'],
+        host=MARIADB['host'],
+        port=MARIADB['port'],
+        database='ticket_system'
+    )
+
+    cursor = connection.cursor()    
+
+    cursor.execute('select title, name, email, status, description from tickets where id = ?', (uuid,))
+    ticket = cursor.fetchone()
+
+    if not ticket: return redirect('/')
+    
+    title, name, email, status, description = ticket
+
+    return render_template('ticket_page.html', title=title, name=name, email=email, status=status, description=description)
 
 
 @app.route('/registrer', methods=['POST'])
