@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, session
 from mariadb import connect
-from secret import MARIADB
-import mariadb
+from secret import MARIADB, SECRET_KEY
+
 from flask import Flask, render_template, request, redirect
 
 app = Flask(__name__)
