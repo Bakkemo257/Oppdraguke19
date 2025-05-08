@@ -1,9 +1,11 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, session
 from mariadb import connect
+# Local file secret.py
 from secret import MARIADB, SECRET_KEY
-from werkzeug.security import generate_password_hash
+from werkzeug.security import check_password_hash, generate_password_hash
 
 app = Flask(__name__)
+app.secret_key = SECRET_KEY
 
 @app.route('/',  methods=["post", "Get"])
 def ticket():
@@ -34,9 +36,9 @@ def ticket():
 @app.route('/login',  methods=["post", "Get"])
 def login():
     if request.method == 'POST':
-        username = request.form["username"] 
+        email = request.form["email"] 
         password = request.form["password"]
-
+    
         connection = connect(
             user=MARIADB['user'],
             password=MARIADB['password'],
@@ -45,10 +47,22 @@ def login():
             database='ticket_system'
         )
 
-        hashed_password = generate_password_hash(password).encode('utf-8')
-        print(hashed_password)
-    
-        return redirect("/login")
+        cursor = connection.cursor()
+        cursor.execute('select hash from clients where email = ?', (email,))
+
+        client = cursor.fetchone()
+
+        if not client:
+            return redirect("/login")
+
+        if not check_password_hash(client[0], password):
+            return redirect("/login")
+
+        # Set session token
+        session['email'] = email
+
+        return redirect('/ansatt')
+
     if request.method =="GET":
         return render_template("login.html")
 
@@ -63,6 +77,15 @@ def ansatt():
     )
 
     cursor = connection.cursor()
+
+    # Check if user is authorized
+    email = session['email']
+    cursor.execute('select * from clients where email = ?', (email,))
+
+    client = cursor.fetchone()
+
+    if not client:
+        return redirect('/login')
 
     cursor.execute('select id, title, description, name, email, status from tickets')
 
@@ -80,6 +103,49 @@ def ansatt():
     print(tickets)
 
     return render_template("ansatt.html", tickets=tickets)
+
+@app.post('/adduser')
+def adduser ():
+    if 'email' not in session:
+        return redirect('/ansatt')
+    
+    password = request.form['password']
+    email = request.form['email']
+    name = request.form['name']
+    admin = 'admin' in request.form
+
+    connection = connect(
+        user=MARIADB['user'],
+        password=MARIADB['password'],
+        host=MARIADB['host'],
+        port=MARIADB['port'],
+        database='ticket_system'
+    )
+
+    cursor = connection.cursor()
+
+    cursor.execute('select admin from clients where email = ?', (session['email'],))
+
+    client = cursor.fetchone()
+
+    if not client:
+        return redirect('/')
+    
+    if not client[0]:
+        return redirect('/ansatt')
+    
+    # Hash password
+    hash = generate_password_hash(password)
+
+    # Add user
+    cursor.execute('insert into clients (email, name, hash, admin) values (?, ?, ?, ?)', (email, name, hash, admin))
+
+    connection.commit()
+    connection.close()
+
+    return redirect('/ansatt')
+
+
 
 if __name__ == "__main__":
     app.run(debug=True)
