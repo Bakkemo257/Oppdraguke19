@@ -1,6 +1,6 @@
 from flask import Flask, render_template
 from mariadb import connect
-from secret import MARIADB
+from secrets import MARIADB
 
 app = Flask(__name__)
 
