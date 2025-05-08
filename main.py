@@ -1,13 +1,35 @@
 from flask import Flask, render_template, request, redirect
 from mariadb import connect
-from secret import MARIADB
+from secret import MARIADB, SECRET_KEY
 from werkzeug.security import generate_password_hash
 
 app = Flask(__name__)
 
-@app.route("/")
+@app.route('/',  methods=["post", "Get"])
 def ticket():
-    return render_template("ticket.html")
+    if request.method == 'POST':
+        title = request.form["title"] 
+        name = request.form["name"]
+        email = request.form["email"] 
+        description = request.form["description"]
+        
+        connection = connect(
+            user=MARIADB['user'],
+            password=MARIADB['password'],
+            host=MARIADB['host'],
+            port=MARIADB['port'],
+            database='ticket_system'
+        )
+        cur = connection.cursor()
+        cur.execute(
+        "INSERT INTO tickets (title, description, email, name) values (?, ?, ?, ?)", 
+        (title, description, email, name ))
+        connection.commit()
+        connection.close()
+        
+        return redirect ("/")
+    if request.method =="GET":
+        return render_template("ticket.html")
 
 @app.route('/login',  methods=["post", "Get"])
 def login():
@@ -15,6 +37,13 @@ def login():
         username = request.form["username"] 
         password = request.form["password"]
 
+        connection = connect(
+            user=MARIADB['user'],
+            password=MARIADB['password'],
+            host=MARIADB['host'],
+            port=MARIADB['port'],
+            database='ticket_system'
+        )
 
         hashed_password = generate_password_hash(password).encode('utf-8')
         print(hashed_password)

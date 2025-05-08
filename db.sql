@@ -4,12 +4,12 @@ CREATE DATABASE ticket_system;
 USE ticket_system;
 
 CREATE TABLE tickets (
-  id CHAR(36) NOT NULL PRIMARY KEY, -- UUID / GUID
+  id CHAR(36) NOT NULL PRIMARY KEY DEFAULT UUID(), -- UUID / GUID
   title VARCHAR(64) NOT NULL,
   description VARCHAR(255) NOT NULL,
   email VARCHAR(64) NOT NULL,
   name VARCHAR(64) NOT NULL,
-  status ENUM('open', 'closed', 'in progress'),
+  status ENUM('open', 'closed', 'in progress') DEFAULT 'open',
   deleted BOOLEAN NOT NULL DEFAULT false
 ) ENGINE = InnoDB;
 
