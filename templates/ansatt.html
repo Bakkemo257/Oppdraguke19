@@ -129,12 +129,16 @@
             </div>
             <p>{{ ticket['description'] }}</p>
             <span>Set status</span>
-            <div class="changestatus">
-              {% for status in ['open', 'in progress', 'closed'] %}
-                  <button onclick="" value="{{status}}" class="status {{ status == 'in progress' and 'inprogress' or status }}">
+            <div>
+              <form class="changestatus" action="ticket_change_status" method="post">
+                {% for status in ['open', 'in progress', 'closed'] %}
+                  <button name="{{ status }}" value="{{status}}" class="status {{ status == 'in progress' and 'inprogress' or status }}">
                     {{ status }}
                   </button>
-              {% endfor %}
+                {% endfor %}
+                <input type="hidden" name="uuid" value="{{ ticket.id }}">
+              </form>
+              
             </div>
           </div>
         {% endfor %}

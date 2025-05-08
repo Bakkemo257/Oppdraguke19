@@ -98,8 +98,8 @@ def ansatt():
         'email': t[4],
         'status': t[5],
     } for t in raw_tickets]
-
-    print(tickets)
+ 
+    """ print(tickets) """
 
     return render_template("ansatt.html", tickets=tickets)
 
@@ -151,5 +151,40 @@ def skrivTilDb():
     navn = request.form['navn']
     alder = request.form['alder']
 
+@app.route('/ticket_change_status', methods=['POST'])
+def ticket_change_status():
+    change_name = ""
+    ticket_id = request.form["uuid"]
+    if 'open' in request.form:
+    # Handle save action
+        change_name ="open"
+    elif 'in progress' in request.form:
+    # Handle delete action
+        change_name ="in progress"
+    elif 'closed' in request.form:
+    # Handle delete action
+        change_name ="closed"
+
+    connection = connect(
+        user=MARIADB['user'],
+        password=MARIADB['password'],
+        host=MARIADB['host'],
+        port=MARIADB['port'],
+        database='ticket_system'
+    )
+
+    cursor = connection.cursor()
+
+    cursor.execute('''
+                    UPDATE tickets
+                    SET status = ?
+                    WHERE id = ?;''', (change_name, ticket_id,) )
+    
+    connection.commit()
+    connection.close()
+    return redirect("/ansatt")
+
+
 if __name__ == "__main__":
     app.run(debug=True)
+
