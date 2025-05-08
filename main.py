@@ -166,7 +166,11 @@ def ticket_page(uuid):
     
     title, name, email, status, description = ticket
 
-    return render_template('ticket_page.html', title=title, name=name, email=email, status=status, description=description)
+    cursor.execute('select m.content, c.name from messages m left join clients c on c.id = m.client_id where m.ticket = ? order by sent_at asc', (uuid,))
+
+    messages = [{ 'content': m[0], 'name': m[1] } for m in cursor.fetchall()]
+
+    return render_template('ticket_page.html', title=title, name=name, email=email, status=status, description=description, messages=messages, uuid=uuid)
 
 
 @app.route('/registrer', methods=['POST'])
@@ -207,6 +211,39 @@ def ticket_change_status():
     connection.close()
     return redirect("/ansatt")
 
+@app.post('/message')
+def send_message():
+    content = request.form['content']
+    ticket = request.form['ticket']
+
+    email = 'email' in session and session['email'] or ''
+
+    if not content or len(content) == 0:
+        return redirect(f'/ticket/{ticket}')
+
+    connection = connect(
+        user=MARIADB['user'],
+        password=MARIADB['password'],
+        host=MARIADB['host'],
+        port=MARIADB['port'],
+        database='ticket_system'
+    )
+
+    cursor = connection.cursor()
+
+    if email:
+        cursor.execute('select id from clients where email = ?', (email,))
+
+        client_id, = cursor.fetchone()
+
+        cursor.execute('insert into messages (content, client_id, ticket, sent_at) values (?, ?, ?, NOW())', (content, client_id, ticket))
+    else:
+        cursor.execute('insert into messages (content, ticket, sent_at) values (?, ?, NOW())', (content, ticket))
+
+    connection.commit()
+    connection.close()
+
+    return redirect(f'/ticket/{ticket}')
 
 if __name__ == "__main__":
     app.run(debug=True)

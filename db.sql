@@ -21,7 +21,15 @@ CREATE TABLE clients (
   admin BOOLEAN NOT NULL DEFAULT false
 ) ENGINE = InnoDB;
 
-
+CREATE TABLE messages (
+  id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  client_id INT,
+  content VARCHAR(255) NOT NULL,
+  ticket CHAR(36) NOT NULL,
+  sent_at TIMESTAMP NOT NULL,
+  CONSTRAINT `fk_messages_clients` FOREIGN KEY (client_id) REFERENCES clients(id),
+  CONSTRAINT `fk_messages_tickets` FOREIGN KEY (ticket) REFERENCES tickets(id)
+) ENGINE = InnoDB;
 
 CREATE TABLE categories (
   id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
