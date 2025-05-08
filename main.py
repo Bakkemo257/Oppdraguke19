@@ -23,12 +23,15 @@ def ticket():
         )
         cur = connection.cursor()
         cur.execute(
-        "INSERT INTO tickets (title, description, email, name) values (?, ?, ?, ?)", 
+        "INSERT INTO tickets (title, description, email, name) values (?, ?, ?, ?) returning id", 
         (title, description, email, name ))
+
+        uuid, = cur.fetchone()
+
         connection.commit()
         connection.close()
         
-        return redirect ("/")
+        return redirect (f"/ticket/{uuid}")
     if request.method =="GET":
         return render_template("ticket.html")
 
