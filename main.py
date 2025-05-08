@@ -1,11 +1,8 @@
-<<<<<<< Updated upstream
 from flask import Flask, render_template, request, redirect, session
 from mariadb import connect
 from secret import MARIADB
-=======
 import mariadb
 from flask import Flask, render_template, request, redirect
->>>>>>> Stashed changes
 
 app = Flask(__name__)
 app.secret_key = SECRET_KEY
