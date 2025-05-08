@@ -70,6 +70,10 @@ def login():
 
 @app.route("/ansatt")
 def ansatt():
+    # Check if user is authorized
+    if not ('email' in session):
+        return redirect('/')
+    
     connection = connect(
         user=MARIADB['user'],
         password=MARIADB['password'],
@@ -80,9 +84,8 @@ def ansatt():
 
     cursor = connection.cursor()
 
-    # Check if user is authorized
     email = session['email']
-    cursor.execute('select * from clients where email = ?', (email,))
+    cursor.execute('select admin from clients where email = ?', (email,))
 
     client = cursor.fetchone()
 
@@ -101,10 +104,8 @@ def ansatt():
         'email': t[4],
         'status': t[5],
     } for t in raw_tickets]
- 
-    """ print(tickets) """
 
-    return render_template("ansatt.html", tickets=tickets)
+    return render_template("ansatt.html", tickets=tickets, admin=client[0])
 
 @app.post('/adduser')
 def adduser ():
@@ -192,6 +193,9 @@ def ticket_change_status():
     # Handle delete action
         change_name ="closed"
 
+    if not session.get('email'):
+        return redirect('/')
+    
     connection = connect(
         user=MARIADB['user'],
         password=MARIADB['password'],
@@ -201,6 +205,13 @@ def ticket_change_status():
     )
 
     cursor = connection.cursor()
+
+    cursor.execute('select admin from clients where email = ?', (session['email'],))
+
+    admin, = cursor.fetchone()
+
+    if not admin and change_name == 'closed':
+        return redirect('/ansatt')
 
     cursor.execute('''
                     UPDATE tickets

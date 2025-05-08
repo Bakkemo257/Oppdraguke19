@@ -131,7 +131,7 @@
             <span>Set status</span>
             <div>
               <form class="changestatus" action="ticket_change_status" method="post">
-                {% for status in ['open', 'in progress', 'closed'] %}
+                {% for status in (admin and ['open', 'in progress', 'closed'] or ['open', 'in progress']) %}
                   <button name="{{ status }}" value="{{status}}" class="status {{ status == 'in progress' and 'inprogress' or status }}">
                     {{ status }}
                   </button>
