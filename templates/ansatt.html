@@ -1,15 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ansatt</title>
-  <style>
-    html, body {
-      margin: 0;
-      height: 100%;
-    }
+{% extends 'base.html' %}
 
+{% block title %}Ansatt{% endblock %}
+
+{% block head %}
+  <style>
     h1, h2, h3, p {
       margin: 0;
     }
@@ -47,17 +41,6 @@
       }
     }
 
-    header {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      height: 3rem;
-      padding: .5rem;
-      &>h1 {
-        font-size: 1.5rem;
-      }
-    }
-
     section {
       padding: .5rem;
     }
@@ -91,14 +74,45 @@
       display: flex;
       flex-direction: row;
       gap: .5rem;
-      justify-content: space-between;
+
+      & .status {
+        flex: 1;
+      }
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: .5rem;
+
+      & input {
+        height: 2rem;
+        border: 1px solid #7f7f7f;
+        margin: 0;
+      }
+    }
+    label {
+      display: flex;
+      flex-direction: column;
+
+      &:has([type="checkbox"]) {
+        flex-direction: row;
+        align-items: center;
+        gap: .5rem;
+
+        &>input {
+          height: 1rem;
+          width: 1rem;
+        }
+      }
     }
   </style>
-</head>
-<body>
-  <header>
-    <h1>Ansatt</h1>
-  </header>
+{% endblock %}
+
+{% block header %}
+  <h1>Ansatt</h1>
+{% endblock %}
+
+{% block content %}
   <main>
     <section>
       <h2>Tickets</h2>
@@ -128,7 +142,25 @@
     </section>
     <section>
       <h2>Brukere</h2>
+      <form action="/adduser" method="post">
+        <label>
+          Epost
+          <input type="email" name="email" placeholder="Epost-adresse">
+        </label>
+        <label>
+          Navn
+          <input type="text" name="name" placeholder="Navn">
+        </label>
+        <label>
+          Passord
+          <input type="password" name="password" placeholder="Passord">
+        </label>
+        <label>
+          Admin
+          <input type="checkbox" name="admin">
+        </label>
+        <input type="submit" value="Legg til bruker">
+      </form>
     </section>
   </main>
-</body>
-</html>
+{% endblock %}
