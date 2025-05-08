@@ -131,9 +131,9 @@
             <span>Set status</span>
             <div class="changestatus">
               {% for status in ['open', 'in progress', 'closed'] %}
-                <button class="status {{ status == 'in progress' and 'inprogress' or status }}">
-                  {{ status }}
-                </button>
+                  <button onclick="" value="{{status}}" class="status {{ status == 'in progress' and 'inprogress' or status }}">
+                    {{ status }}
+                  </button>
               {% endfor %}
             </div>
           </div>
