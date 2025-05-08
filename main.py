@@ -1,8 +1,8 @@
 from flask import Flask, render_template, request, redirect, session
 from mariadb import connect
-# Local file secret.py
-from secret import MARIADB, SECRET_KEY
-from werkzeug.security import check_password_hash, generate_password_hash
+from secret import MARIADB
+import mariadb
+from flask import Flask, render_template, request, redirect
 
 app = Flask(__name__)
 app.secret_key = SECRET_KEY
@@ -146,6 +146,11 @@ def adduser ():
     return redirect('/ansatt')
 
 
+
+@app.route('/registrer', methods=['POST'])
+def skrivTilDb():
+    navn = request.form['navn']
+    alder = request.form['alder']
 
 if __name__ == "__main__":
     app.run(debug=True)
