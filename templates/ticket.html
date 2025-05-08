@@ -1,33 +1,66 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    <div>
-        <h1>Fjell Bedriftsløsninger</h1>
-        <h2>Tickets</h2>
-        <p>Titel</p>
-        <form action="/" method="post">
-            <input type="title"
-                    name="title"
-                    placeholder="title">
-            <p>Full Name</p>
-            <input type="name"
-                    name="name"
-                    placeholder="Name">
-            <p>E-mail</p>
-            <input  type="email"
-                    name="email"
-                    placeholder="email">
-            <p>Description</p>
-            <input type="description"
-                    name="description"
-                    placeholder="description">
-            <button type="submit">Send Ticket</button>
-        </form>
-    
-</body>
-</html>
+{% extends 'base.html' %}
+
+{% block title %}Ny ticket{% endblock %}
+
+{% block head %}
+  <style>
+    main {
+      padding: .5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex: 1;
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: .5rem;
+      width: 100%;
+      max-width: 500px;
+    }
+    label {
+      display: flex;
+      flex-direction: row;
+      
+      gap: .5rem;
+
+      &>input, &>textarea {
+        flex: 1;
+        resize: vertical;
+      }
+    }
+  </style>
+{% endblock %}
+
+{% block header %}<h1>Ny ticket</h1>{% endblock %}
+
+{% block content %}
+  <main>
+    <form action="/" method="post">
+      <label>
+        Tittel
+        <input type="text"
+               name="title"
+               placeholder="Tittel">
+      </label>
+      <label>
+        Fullt navn
+        <input type="text"
+               name="name"
+               placeholder="Navn">
+      </label>
+      <label>
+        E-post
+        <input type="email"
+               name="email"
+               placeholder="E-post">
+      </label>
+      <label>
+        Beskrivelse
+        <textarea name="description" placeholder="Beskrivelse"></textarea>
+      </label>
+      <button type="submit">Send Ticket</button>
+    </form>
+  </main>
+{% endblock %}

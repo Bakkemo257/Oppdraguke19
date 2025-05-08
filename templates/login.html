@@ -1,47 +1,39 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+{% extends 'base.html' %}
+
+{% block title %}Ansatte - Logg inn{% endblock %}
+
+{% block head %}
     <style>
-        html { height: 100%; }
-        body {
-            height: 100%;
-            margin: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
         .main {
             display: flex;
             flex-direction: column;
-            height: 70%;
-            width: 70%;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
         }
         .form{
+            height: 70%;
+            width: 70%;
             display: flex;
             flex-direction: column;
             gap: 0.5rem;
         }
     </style>
-</head>
+{% endblock %}
 
-<body>
-        <div class="main">
-            <h1>Login</h1>
-            <form class="form" method="POST" action="/login">
-                <input type="email"
-                    name="email"
-                    placeholder="Epost-adresse">
-                <input type="password"
-                    name="password"
-                    placeholder="Password">
-            <button type="submit">submit</button>
+{% block header %}<h1>Logg inn</h1>{% endblock %}
+
+{% block content %}
+    <div class="main">
+        <form class="form" method="POST" action="/login">
+            <input type="email"
+                name="email"
+                placeholder="Epost-adresse">
+            <input type="password"
+                name="password"
+                placeholder="Password">
+            <button type="submit">Logg inn</button>
         </form>
     </div>
-       
-        
-        
-</body>
-</html>
+
+{% endblock %}
