@@ -119,6 +119,7 @@
       <div class="tickets">
         {% for ticket in tickets %}
           <div class="ticket">
+            {% if admin %}
             <div class="title">
               <h3>
                 {{ ticket['title'] }}

@@ -85,7 +85,9 @@ def ansatt():
     cursor.execute('select * from clients where email = ?', (email,))
 
     client = cursor.fetchone()
-
+    client_admin = client[2]
+    if client_admin == "Administrator":
+        session["admin"] = True
     if not client:
         return redirect('/login')
 
@@ -103,8 +105,8 @@ def ansatt():
     } for t in raw_tickets]
  
     """ print(tickets) """
-
-    return render_template("ansatt.html", tickets=tickets)
+    admin = session["admin"]
+    return render_template("ansatt.html", tickets=tickets, admin=admin)
 
 @app.post('/adduser')
 def adduser ():
