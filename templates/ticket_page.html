@@ -8,19 +8,21 @@
   <style>
     main {
       display: flex;
+      flex-direction: column;
+      gap: 1rem;
       align-items: center;
       justify-content: center;
       padding: .5rem;
       flex: 1;
 
-      &>.ticket {
+      &>* {
         width: 500px;
         max-width: 100%;
         box-sizing: border-box;
         padding: 1rem;
         gap: 1rem;
         border-radius: .5rem;
-        box-shadow: 0 1rem 2rem 0 #0000007f;
+        box-shadow: 0 .5rem 1rem 0 #0000007f;
         display: flex;
         flex-direction: column;
 
@@ -37,7 +39,7 @@
         }
       }
     }
-    
+
     .status {
       padding: 0 .75rem;
       border-radius: 1rem;
@@ -61,6 +63,45 @@
         color: white;
       }
     }
+    .messagelist {
+      display: flex;
+      flex-direction: column;
+      gap: .125rem;
+
+      &>.message {
+        padding: .5rem;
+        border-radius: .75rem;
+        max-width: 80%;
+        &.left {
+          align-self: flex-start;
+          background-color: teal;
+          color: white;
+        }
+
+        &.right {
+          align-self: flex-end;
+          background-color: lightgray;
+        }
+      }
+    }
+    form {
+      display: flex;
+      flex-direction: row;
+      gap: .5rem;
+
+      &>input {
+        margin: 0;
+        padding: 0;
+        height: 2.5rem;
+        border: .125rem solid #dfdfdf;
+        padding: .5rem;
+        box-sizing: border-box;
+      }
+
+      &>[type="text"] {
+        flex: 1;
+      }
+    }
   </style>
 {% endblock %}
 
@@ -74,6 +115,19 @@
         <span>({{ email }})</span>
       </div>
       <span class="status {{ status == 'in progress' and 'inprog' or status }}">{{ status }}</span>
+    </div>
+    <div class="messages">
+      <h2>Meldinger</h2>
+      <div class="messagelist">
+        {% for message in messages %}
+          <span class="message {{ message['name'] and 'left' or 'right' }}">{{ message['content'] }}</span>
+        {% endfor %}
+      </div>
+      <form action="/message" method="post">
+        <input type="text" name="content" placeholder="Melding">
+        <input type="hidden" name="ticket" value="{{ uuid }}">
+        <input type="submit" value="Send">
+      </form>
     </div>
   </main>
 {% endblock %}

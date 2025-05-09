@@ -70,6 +70,10 @@ def login():
 
 @app.route("/ansatt")
 def ansatt():
+    # Check if user is authorized
+    if not ('email' in session):
+        return redirect('/')
+    
     connection = connect(
         user=MARIADB['user'],
         password=MARIADB['password'],
@@ -80,14 +84,11 @@ def ansatt():
 
     cursor = connection.cursor()
 
-    # Check if user is authorized
     email = session['email']
-    cursor.execute('select * from clients where email = ?', (email,))
+    cursor.execute('select admin from clients where email = ?', (email,))
 
     client = cursor.fetchone()
-    client_admin = client[2]
-    if client_admin == "Administrator":
-        session["admin"] = True
+
     if not client:
         return redirect('/login')
 
@@ -103,10 +104,8 @@ def ansatt():
         'email': t[4],
         'status': t[5],
     } for t in raw_tickets]
- 
-    """ print(tickets) """
-    admin = session["admin"]
-    return render_template("ansatt.html", tickets=tickets, admin=admin)
+
+    return render_template("ansatt.html", tickets=tickets, admin=client[0])
 
 @app.post('/adduser')
 def adduser ():
@@ -168,7 +167,11 @@ def ticket_page(uuid):
     
     title, name, email, status, description = ticket
 
-    return render_template('ticket_page.html', title=title, name=name, email=email, status=status, description=description)
+    cursor.execute('select m.content, c.name from messages m left join clients c on c.id = m.client_id where m.ticket = ? order by sent_at asc', (uuid,))
+
+    messages = [{ 'content': m[0], 'name': m[1] } for m in cursor.fetchall()]
+
+    return render_template('ticket_page.html', title=title, name=name, email=email, status=status, description=description, messages=messages, uuid=uuid)
 
 
 @app.route('/registrer', methods=['POST'])
@@ -190,6 +193,9 @@ def ticket_change_status():
     # Handle delete action
         change_name ="closed"
 
+    if not session.get('email'):
+        return redirect('/')
+    
     connection = connect(
         user=MARIADB['user'],
         password=MARIADB['password'],
@@ -200,6 +206,13 @@ def ticket_change_status():
 
     cursor = connection.cursor()
 
+    cursor.execute('select admin from clients where email = ?', (session['email'],))
+
+    admin, = cursor.fetchone()
+
+    if not admin and change_name == 'closed':
+        return redirect('/ansatt')
+
     cursor.execute('''
                     UPDATE tickets
                     SET status = ?
@@ -209,6 +222,39 @@ def ticket_change_status():
     connection.close()
     return redirect("/ansatt")
 
+@app.post('/message')
+def send_message():
+    content = request.form['content']
+    ticket = request.form['ticket']
+
+    email = 'email' in session and session['email'] or ''
+
+    if not content or len(content) == 0:
+        return redirect(f'/ticket/{ticket}')
+
+    connection = connect(
+        user=MARIADB['user'],
+        password=MARIADB['password'],
+        host=MARIADB['host'],
+        port=MARIADB['port'],
+        database='ticket_system'
+    )
+
+    cursor = connection.cursor()
+
+    if email:
+        cursor.execute('select id from clients where email = ?', (email,))
+
+        client_id, = cursor.fetchone()
+
+        cursor.execute('insert into messages (content, client_id, ticket, sent_at) values (?, ?, ?, NOW())', (content, client_id, ticket))
+    else:
+        cursor.execute('insert into messages (content, ticket, sent_at) values (?, ?, NOW())', (content, ticket))
+
+    connection.commit()
+    connection.close()
+
+    return redirect(f'/ticket/{ticket}')
 
 if __name__ == "__main__":
     app.run(debug=True)
